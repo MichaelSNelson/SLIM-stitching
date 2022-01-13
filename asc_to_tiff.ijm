@@ -5,7 +5,7 @@
 #@ File (label = "Input directory", style = "directory") input
 #@ File (label = "Output directory", style = "directory") output
 #@ String (label = "File suffix", value = "photons.asc") suffix
-
+#@ String (label = "File name suffix, e.g. photons (not extensions like .tif)") imageType
 // See also Process_Folder.py for a version of this code
 // in the Python scripting language.
 setBatchMode(true);
@@ -16,19 +16,12 @@ function processFolder(input) {
 	list = getFileList(input);
 	list = Array.sort(list);
 	for (i = 0; i < list.length; i++) {
-		if(File.isDirectory(input + File.separator + list[i]))
-			processFolder(input + File.separator + list[i]);
 		if(endsWith(list[i], suffix))
-		 	processFile(input, output, list[i]);
+		 	saveastif(input, output, list[i]);
 	}
 }
 
-function processFile(input, output, file) {
-	// Do the processing here by adding your own code.
-	// Leave the print statements until things work, then remove them.
-	print("Processing: " + file);
+function saveastif(input, file) {
 	run("Text Image... ", "open=["+ input + File.separator  +file+"]");
-	saveAs("Tiff", output + File.separator +file );
-	close();	
-	print("Saving to: " + output);
+	saveAs("Tiff", input + File.separator +file );
 }

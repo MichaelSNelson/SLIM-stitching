@@ -13,7 +13,7 @@
 #@ File (label = "Input directory", style = "directory") input
 //#@ File (label = "Output directory", style = "directory") output
 #@ File (label = ".xyz file", style = "file") xyzFile
-#@ String (label = "File name suffix, e.g. photons (not extensions like .tif)") imageType
+#@ String (label = "File name suffix, e.g. photons (not extensions like .tif)") suffix
 //
 ////////////////////////////////////////////////
 //Create new output sub-directory to selected Input directory - if one already exists
@@ -57,7 +57,7 @@ zMax = 0;
 //******************************************************//
 for (i = 0; i < list.length; i++) {
 	//Get the names of the files that end in photons.tif
-	if(list[i].endsWith(imageType+".tif")){
+	if(list[i].endsWith(suffix+".tif")){
 		//zFileList = Array.concat(zFileList, list[i]);
 		zPosition = split(list[i], "(_Z)");
 		Array.print(zPosition);
@@ -182,7 +182,7 @@ function returnFileListCurrentZ(list, regExMatch){
 	for (j = 0; j < list.length; j++) {
 	
 		//Get the names of the files that end in requiredString.tif
-		if(list[j].endsWith(imageType+".tif") && list[j].matches(regExMatch)){
+		if(list[j].endsWith(suffix+".tif") && list[j].matches(regExMatch)){
 			zFileList[k] = list[j];
 			k=k+1;
 		}
