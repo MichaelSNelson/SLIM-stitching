@@ -1,5 +1,4 @@
-
-/* README
+/* README
  * - Target the folder with the photon.tif files, all files for all Z slices should be in the same folder
  * - Filenames MUST NOT INCLUDE "_Z" in the file name anywhere other than where the Z position is defined
  * - Limited to Wiscscan FLIM sdt file outputs and setup on SLIM scope with a minimum overlap of  ___ % or ___ pixels
@@ -13,24 +12,23 @@
 #@ File (label = "*.asc file folder", style = "directory") input
 #@ File (label = "*.xyz file", style = "file") xyzFile
 #@ String (label = "File suffix eg: photons, a1[%], a1, color coded value") suffix
-
-// CHECKBOX :TODO SECTIONS
-make_asc = true;
-write_tileconfig = true;
-stitch_files = true;
+#@ Boolean (label = "Make the asc files into tif files for stitching", value=true) make_asc
+#@ Boolean (label = "Write out the TileConfiguration_Z.txt files", value =true) write_tileconfig
+#@ Boolean (label = "Make the asc files into tif files for stitching", value=true) stitch_files
+#@ Boolean (label = "Crop the top and bottom line of pixels", value=true) crop_pixels
+#@ String (visibility=MESSAGE, value="There must be tile configuration tiles for the script to stitch successfully!", required=false) message
 
 
 // 1. CREATE TIFF FILES FROM ASC
 // WILL OVERWRITE TIF EXISTING
 	if (make_asc){	
-	list = getFileList(input);
+		list = getFileList(input);
 		setBatchMode(true);
 		list = Array.sort(list);
 		for (i = 0; i < list.length; i++) 	{
-			if(endsWith(list[i], suffix+".asc"))
-			 	//TO DO
-			 	//REMOVE TOP AND BOTTOM LINE OF PIXELS
-			 	saveastif(input, list[i]);	}
+			if(endsWith(list[i], suffix+".asc")){
+				saveastif(input, list[i]);	}
+		}
 			 	
 	}
 
@@ -111,7 +109,7 @@ stitch_files = true;
 	output = input+File.separator+"output_"+ suffix+ "_" + tm;
 	File.makeDirectory(output);	
 	StitchFiles(input, output, n_zpos);
-
+	print("Processing completed, results in "+output);
  }
 
 
@@ -121,9 +119,19 @@ stitch_files = true;
 
 // FUNCTION TO CHANGE ASC TO TIF
 function saveastif(input, file) {
-	run("Text Image... ", "open=["+ input + File.separator  +file+"]");
-	saveAs("Tiff", input + File.separator +file );
+	if(crop_pixels){
+		run("Text Image... ", "open=["+ input + File.separator  +file+"]");
+		height = getHeight;
+		width = getWidth;
+		run("Specify...", "width="+width+" height="+height-2+" centered");
+		run("Crop");
+		saveAs("Tiff", input  + File.separator+file );
+	}else{
+		run("Text Image... ", "open=["+ input + File.separator  +file+"]");
+		saveAs("Tiff", input + File.separator +file );
+	}
 }
+
 
 
 // FUNCTION TO GET THE CURRENT TIME AS A STRING
