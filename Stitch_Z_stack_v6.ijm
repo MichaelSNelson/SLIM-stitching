@@ -28,7 +28,10 @@ stitch_files = true;
 		list = Array.sort(list);
 		for (i = 0; i < list.length; i++) 	{
 			if(endsWith(list[i], suffix+".asc"))
+			 	//TO DO
+			 	//REMOVE TOP AND BOTTOM LINE OF PIXELS
 			 	saveastif(input, list[i]);	}
+			 	
 	}
 
 
@@ -103,12 +106,9 @@ stitch_files = true;
 
 	if(stitch_files) {
 	// CREATE OUTPUT FOLDER WITHOUT OVERWRITING:
-	output = input+File.separator+"output" ;
-	if (File.exists(output)) {
-		tm = gettimestring();
-		output = output  + tm;
-		//File.rename(input+File.separator+"output",input+File.separator+"output_renamed_"+tm);
-	} 
+			tm = gettimestring();
+
+	output = input+File.separator+"output_"+ suffix+ "_" + tm;
 	File.makeDirectory(output);	
 	StitchFiles(input, output, n_zpos);
 
