@@ -63,13 +63,14 @@
 	stage_stepsize = calculate_step_size(arr_for_calc_minimum_img_size);
 	image_size = 256.0 ; // WISCSCAN FIXED FLIM SIZE
 	pixel_size =  stage_stepsize / image_size ; 
+	pixel_size = parseFloat(d2s(pixel_size, 1));
 	print('PixelSize = ',pixel_size);
+	//Array.show(xPos);
 	// make pixels for Tile config
 	for (i = 0; i < rows.length ; i++) {
 		xPos[i] = xPos[i]/pixel_size; 
 		yPos[i] = yPos[i]/pixel_size;
 		}
-
 
 		// FIND Number of Z positions by reading filename _Z in sdt exported files
 		
@@ -123,7 +124,8 @@ function saveastif(input, file) {
 		run("Text Image... ", "open=["+ input + File.separator  +file+"]");
 		height = getHeight;
 		width = getWidth;
-		run("Specify...", "width="+width+" height="+height-2+" centered");
+		//run("Specify...", "width="+width+" height="+height-2);
+		run("Specify...", "width=256 height=254 x=0 y=1");
 		run("Crop");
 		saveAs("Tiff", input  + File.separator+file );
 	}else{
