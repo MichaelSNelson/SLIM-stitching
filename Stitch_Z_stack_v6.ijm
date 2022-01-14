@@ -122,8 +122,8 @@
 function saveastif(input, file) {
 	if(crop_pixels){
 		run("Text Image... ", "open=["+ input + File.separator  +file+"]");
-		height = getHeight;
-		width = getWidth;
+		//height = getHeight;
+		//width = getWidth;
 		//run("Specify...", "width="+width+" height="+height-2);
 		run("Specify...", "width=256 height=254 x=0 y=1");
 		run("Crop");
@@ -258,6 +258,9 @@ function stitch_file(input, output, file) {
 	//may need to rename file as it is created
 	File.rename(output+File.separator +"img_t1_z1_c1", output+File.separator +"Z"+n+".tif");
 	//print("Processed: " + input + File.separator + file);
-
+	// open the fused image (grid stitcher wont save and display AFAIK
+	open(output+File.separator +"Z"+n+".tif");
+	run("Enhance Contrast", "saturated=0.35");
+	
 }
 
