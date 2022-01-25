@@ -14,7 +14,7 @@
 #@ String (label = "File suffix eg: photons, a1[%], a1, color coded value") suffix
 #@ Boolean (label = "Make the asc files into tif files for stitching", value=true) make_asc
 #@ Boolean (label = "Write out the TileConfiguration_Z.txt files", value =true) write_tileconfig
-#@ Boolean (label = "Make the asc files into tif files for stitching", value=true) stitch_files
+#@ Boolean (label = "Perform stitching", value=true) stitch_files
 #@ Boolean (label = "Crop the top and bottom line of pixels", value=true) crop_pixels
 #@ String (visibility=MESSAGE, value="There must be tile configuration tiles for the script to stitch successfully!", required=false) message
 
@@ -40,38 +40,38 @@
 	if (write_tileconfig){
 
 
-	filestring = File.openAsString(xyzFile);
+		filestring = File.openAsString(xyzFile);
+		
+		//Begin parsing the string returned from the xyz file
+		//remove the first two lines that contain text.
+		rows = split(filestring, "\n");
+		rows = Array.deleteIndex(rows, 0);
+		rows = Array.deleteIndex(rows, 0);
+		// Read the positions as floats
+		xPos = newArray(rows.length);
+		yPos = newArray(rows.length);
+		arr_for_calc_minimum_img_size = newArray(rows.length);
+		for (i = 0; i < rows.length ; i++) {
+			periodSplit = split(rows[i], ".");
+			x = parseFloat(periodSplit[0]+"."+substring(periodSplit[1], 0, 5));
+			y = parseFloat(substring(periodSplit[1], 5)+"."+substring(periodSplit[2], 0, 5)); 
+			xPos[i] = x;
+			yPos[i] = y;	
+			arr_for_calc_minimum_img_size[i] = x;
+		}
+		// find the stage-stepsize
+		stage_stepsize = calculate_step_size(arr_for_calc_minimum_img_size);
+		image_size = 256.0 ; // WISCSCAN FIXED FLIM SIZE
+		pixel_size =  stage_stepsize / image_size ; 
+		pixel_size = parseFloat(d2s(pixel_size, 1));
+		print('PixelSize = ',pixel_size);
+		//Array.show(xPos);
+		// make pixels for Tile config
+		for (i = 0; i < rows.length ; i++) {
+			xPos[i] = xPos[i]/pixel_size; 
+			yPos[i] = yPos[i]/pixel_size;
+		}
 	
-	//Begin parsing the string returned from the xyz file
-	//remove the first two lines that contain text.
-	rows = split(filestring, "\n");
-	rows = Array.deleteIndex(rows, 0);
-	rows = Array.deleteIndex(rows, 0);
-	// Read the positions as floats
-	xPos = newArray(rows.length);
-	yPos = newArray(rows.length);
-	arr_for_calc_minimum_img_size = newArray(rows.length);
-	for (i = 0; i < rows.length ; i++) {
-		periodSplit = split(rows[i], ".");
-		x = parseFloat(periodSplit[0]+"."+substring(periodSplit[1], 0, 5));
-		y = parseFloat(substring(periodSplit[1], 5)+"."+substring(periodSplit[2], 0, 5)); 
-		xPos[i] = x;
-		yPos[i] = y;	
-		arr_for_calc_minimum_img_size[i] = x;
-		}
-	// find the stage-stepsize
-	stage_stepsize = calculate_step_size(arr_for_calc_minimum_img_size);
-	image_size = 256.0 ; // WISCSCAN FIXED FLIM SIZE
-	pixel_size =  stage_stepsize / image_size ; 
-	pixel_size = parseFloat(d2s(pixel_size, 1));
-	print('PixelSize = ',pixel_size);
-	//Array.show(xPos);
-	// make pixels for Tile config
-	for (i = 0; i < rows.length ; i++) {
-		xPos[i] = xPos[i]/pixel_size; 
-		yPos[i] = yPos[i]/pixel_size;
-		}
-
 		// FIND Number of Z positions by reading filename _Z in sdt exported files
 		
 		n_zpos = get_number_of_z_slices(input,suffix);  // number of Z slices (0 base)
@@ -80,7 +80,8 @@
 		//Now cycle through each Z, and create a TileConfiguration_Z.txt
 		for (i = 0; i < n_zpos+1; i++) {
 			regExMatch = ".*_Z"+i+"_.*";
-			
+			list = getFileList(input);
+
 			//Get the names of the files that end in requiredString.tif
 			zFileList = returnFileListCurrentZ(list, regExMatch);	
 			print("#files matching string " +regExMatch + " = ", n_zpos);
@@ -96,8 +97,8 @@
 				print(f, zFileList[l]+" ; ; ("+xPos[l]+","+yPos[l]+")\n");
 				}
 			File.close(f);
-			}
 		}
+	}
 
 
 // 3. MAKE OUTPUT FOLDER AND STITCH FILES
