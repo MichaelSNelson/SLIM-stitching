@@ -228,7 +228,7 @@ function StitchFiles(input, output, zMax) {
 	//close();
 	run("Image Sequence...", "dir=["+output+"] filter=tif sort");
 	
-	saveAs("TIFF", output+File.separator +estimatedName+"_zStack");
+	saveAs("TIFF", output+File.separator +estimatedName+"_"+suffix+"_zStack");
 	close();
 }
 
